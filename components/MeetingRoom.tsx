@@ -1,24 +1,29 @@
+import EndCallButton from "./EndCallButton";
+import Loader from "./Loader";
+
 import { cn } from "@/lib/utils";
+import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { LayoutList, Users } from "lucide-react";
+
 import {
 	CallControls,
+	CallingState,
 	CallParticipantsList,
 	CallStatsButton,
 	PaginatedGridLayout,
 	SpeakerLayout,
+  useCallStateHooks,
 } from "@stream-io/video-react-sdk";
-import React, { useState } from "react";
 
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LayoutList, Users } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-// import EndCallButton from "./EndCallButton";
+
 
 type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
 
@@ -27,6 +32,11 @@ const MeetingRoom = () => {
   const isPersonalRoom = !!searchParams.get('personal');
 	const [layout, setLayout] = useState<CallLayoutType>("speaker-left");
 	const [showParticipants, setShowParticipants] = useState(false);
+
+  const { useCallCallingState } = useCallStateHooks();
+  const callingState = useCallCallingState();
+
+  if(callingState !== CallingState.JOINED)  return <Loader />
 
 	const CallLayout = () => {
 		switch (layout) {
@@ -90,7 +100,7 @@ const MeetingRoom = () => {
               <Users size={20} className="text-white"/>
             </div>
         </button>
-        {/* {!isPersonalRoom && <EndCallButton />} */}
+        {!isPersonalRoom && <EndCallButton />}
 			</div>
 		</section>
 	);
