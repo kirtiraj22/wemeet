@@ -3,7 +3,7 @@ import Loader from "./Loader";
 
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutList, Users } from "lucide-react";
 
 import {
@@ -13,7 +13,7 @@ import {
 	CallStatsButton,
 	PaginatedGridLayout,
 	SpeakerLayout,
-  useCallStateHooks,
+	useCallStateHooks,
 } from "@stream-io/video-react-sdk";
 
 import {
@@ -24,19 +24,19 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
 
 const MeetingRoom = () => {
-  const searchParams = useSearchParams();
-  const isPersonalRoom = !!searchParams.get('personal');
+	const searchParams = useSearchParams();
+	const isPersonalRoom = !!searchParams.get("personal");
 	const [layout, setLayout] = useState<CallLayoutType>("speaker-left");
 	const [showParticipants, setShowParticipants] = useState(false);
 
-  const { useCallCallingState } = useCallStateHooks();
-  const callingState = useCallCallingState();
+	const router = useRouter();
+	const { useCallCallingState } = useCallStateHooks();
+	const callingState = useCallCallingState();
 
-  if(callingState !== CallingState.JOINED)  return <Loader />
+	if (callingState !== CallingState.JOINED) return <Loader />;
 
 	const CallLayout = () => {
 		switch (layout) {
@@ -66,7 +66,7 @@ const MeetingRoom = () => {
 				</div>
 			</div>
 			<div className="fixed bottom-0 flex w-full items-center justify-center gap-5 flex-wrap">
-				<CallControls />
+				<CallControls onLeave={() => router.push("/")} />
 				<DropdownMenu>
 					<div className="flex items-center">
 						<DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
@@ -87,20 +87,20 @@ const MeetingRoom = () => {
 									>
 										{item}
 									</DropdownMenuItem>
-                  <DropdownMenuSeparator className="border-dark-1"/>
+									<DropdownMenuSeparator className="border-dark-1" />
 								</div>
 							)
 						)}
 						<DropdownMenuSeparator />
 					</DropdownMenuContent>
 				</DropdownMenu>
-        <CallStatsButton />
-        <button onClick={()=> setShowParticipants((prev) => !prev)}>
-            <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-              <Users size={20} className="text-white"/>
-            </div>
-        </button>
-        {!isPersonalRoom && <EndCallButton />}
+				<CallStatsButton />
+				<button onClick={() => setShowParticipants((prev) => !prev)}>
+					<div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+						<Users size={20} className="text-white" />
+					</div>
+				</button>
+				{!isPersonalRoom && <EndCallButton />}
 			</div>
 		</section>
 	);
